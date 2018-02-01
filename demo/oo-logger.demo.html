@@ -1,0 +1,21 @@
+<meta charset="utf-8">
+
+<script src="../../webcomponentsjs/webcomponents-loader.js"></script>
+<link rel="import" href="../../polymer/lib/elements/dom-bind.html">
+<link rel="import" href="../oo-logger.html">
+
+<dom-bind>
+  <template>
+    <oo-logger>
+    </oo-logger>
+  </template>
+
+  <script>
+
+    window.addEventListener("WebComponentsReady", () => {
+      const domBind = document.querySelector("dom-bind")
+      const logger = document.querySelector("oo-logger")
+    })
+
+  </script>
+</dom-bind>

@@ -1,0 +1,43 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="./oo-logger-mixin.html">
+
+<dom-module id="oo-logger">
+
+  <script>
+    // Declare in local function scope to avoid bleeding variables into global `window`.
+    (function () {
+
+      /**
+       * @customElement
+       * @polymer
+       */
+      class OoLogger extends Oo.LoggerMixin(Polymer.Element) {
+        static get is() {
+          return "oo-logger"
+        }
+
+        static get properties() {
+          return {
+            title: {
+              type: String,
+              value: () => "lorem ipsum dolor"
+            }
+          }
+        }
+
+        ready() {
+          super.ready()
+
+          this._trace("title:", this.title)
+          this._debug("title:", this.title)
+          this._info("title:", this.title)
+          this._warn("title:", this.title)
+        }
+      }
+
+      window.customElements.define(OoLogger.is, OoLogger)
+
+    }())
+  </script>
+
+</dom-module>
