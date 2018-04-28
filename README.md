@@ -24,18 +24,34 @@ Add `oo-logger` as dependency to your `bower.json`.
 $ bower install --save oolymer/oo-logger
 ~~~
 
-Add `oo-logger.html` as HTML import to your `*.html`.
+Add `oo-logger-mixin.html` as HTML import to your `*.html`.
 
 ~~~html
-<link rel="import" href="../oo-logger/oo-logger.html">
+<link rel="import" href="../oo-logger/oo-logger-mixin.html">
 ~~~
 
-Use `<oo-logger>` element.
+Add `oo.LoggerMixin` to your custom element.
 
 ~~~html
-<body>
-  <oo-logger></oo-logger>
-</body>
+<dom-module id="demo-logger">
+  <script>
+    class DemoLogger extends oo.LoggerMixin(Polymer.Element) {
+      static get is() {
+        return "demo-logger"
+      }
+
+      ready() {
+        super.ready()
+        this._trace("inky")
+        this._debug("blinky")
+        this._info("pinky")
+        this._warn("clyde")
+      }
+    }
+
+    window.customElements.define(DemoLogger.is, DemoLogger)
+  </script>
+</dom-module>
 ~~~
 
 ## Contributing
