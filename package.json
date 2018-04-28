@@ -1,30 +1,42 @@
 {
   "name": "oo-logger",
-  "description": "Simple logger",
-  "version": "0.0.0",
+  "description": "Polymer mixin for browser console logging. Supports different log levels.",
+  "version": "0.1.0",
   "author": "Benjamin Gudehus <benjamin.gudehus@canoo.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hastebrot/canoo-route-elements.git"
+    "url": "https://github.com/oolymer/oo-logger.git"
   },
   "license": "MIT",
   "private": true,
-  "scripts": {
-    "browser": "./node_modules/.bin/npm-run-all --parallel serve watch",
-    "build": "./node_modules/.bin/polymer build",
-    "build:docs": "./node_modules/.bin/polymer analyze > analysis.json",
-    "lint": "npm run lint:polymer",
-    "lint:js": "./node_modules/.bin/eslint . --ext js,html --ignore-path .gitignore",
-    "lint:polymer": "./node_modules/.bin/polymer lint",
-    "serve": "./node_modules/.bin/polymer serve --port 9090",
-    "test": "./node_modules/.bin/polymer test --local firefox",
-    "watch": "./node_modules/.bin/browser-sync start --port 3000 --proxy 'localhost:9090' --no-ui --files '*.html, *.js, demo/**/*.html, test/**/*.html' --startPath \"/components/$npm_package_name/\""
-  },
   "devDependencies": {
-    "bower": "1.8.2",
+    "bower": "1.8.4",
     "browser-sync": "2.23.6",
+    "npm-delay": "1.0.4",
     "npm-run-all": "4.1.2",
-    "polymer-cli": "1.5.7",
+    "polymer-cli": "1.6.0",
     "web-component-tester": "6.5.0"
+  },
+  "scripts": {
+    "start": "npm run dev",
+    "test": "npm run test:headless",
+    "build": "./node_modules/.bin/npm-run-all --serial build:polymer",
+    "build:polymer": "./node_modules/.bin/polymer build",
+    "build:polymer:docs": "./node_modules/.bin/polymer analyze > analysis.json",
+    "dev": "./node_modules/.bin/npm-run-all --parallel serve dev:serve-watch",
+    "dev:serve-watch": "./node_modules/.bin/npm-run-all --serial util:delay serve:watch",
+    "install:bower": "./node_modules/.bin/bower install --force-latest",
+    "serve": "./node_modules/.bin/polymer serve --port $npm_package_config_portServe",
+    "serve:build": "./node_modules/.bin/polymer serve --port $npm_package_config_portServeBuild build/default",
+    "serve:watch": "./node_modules/.bin/browser-sync start --port $npm_package_config_portServeWatch --proxy \"localhost:$npm_package_config_portServe\" --no-ui --files '*.js, *.html, demo/**/*.html, src/**/*.html, test/**/*.html' --startPath \"/components/$npm_package_name/\"",
+    "test:headless": "./node_modules/.bin/wct --expanded --local chrome --local firefox --configFile 'wct-headless.conf.json'",
+    "test:chrome": "./node_modules/.bin/polymer test --local chrome --persistent --skip-selenium-install",
+    "test:firefox": "./node_modules/.bin/polymer test --local firefox --persistent --skip-selenium-install",
+    "util:delay": "node ./node_modules/.bin/npm-delay 250"
+  },
+  "config": {
+    "portServe": "8700",
+    "portServeWatch": "8710",
+    "portServeBuild": "8720"
   }
 }
