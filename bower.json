@@ -1,7 +1,7 @@
 {
   "name": "oo-logger",
-  "description": "Simple logger",
-  "version": "0.0.0",
+  "description": "Polymer mixin for browser console logging. Supports different log levels.",
+  "version": "0.1.0",
   "authors": [
     "Benjamin Gudehus <benjamin.gudehus@canoo.com>"
   ],
@@ -11,23 +11,24 @@
       "url": "https://opensource.org/licenses/MIT"
     }
   ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^2.6.0"
+  },
+  "devDependencies": {
+    "font-roboto": "PolymerElements/font-roboto-local#^1.0.0",
+    "iron-component-page": "PolymerElements/iron-component-page#^3.0.0",
+    "web-component-tester": "Polymer/web-component-tester#6.5.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#1.2.0"
+  },
+  "resolutions": {
+    "polymer": "2.6.0"
+  },
   "ignore": [
     "**/.*",
     "demo",
     "test",
     "package.json",
-    "package-lock.json"
-  ],
-  "dependencies": {
-    "polymer": "Polymer/polymer#2.4.0"
-  },
-  "devDependencies": {
-    "font-roboto": "PolymerElements/font-roboto-local#1.0.1",
-    "iron-component-page": "PolymerElements/iron-component-page#3.0.1",
-    "web-component-tester": "Polymer/web-component-tester#6.5.0",
-    "webcomponentsjs": "webcomponents/webcomponentsjs#1.1.0"
-  },
-  "resolutions": {
-    "polymer": "2.4.0"
-  }
+    "package-lock.json",
+    "yarn.lock"
+  ]
 }

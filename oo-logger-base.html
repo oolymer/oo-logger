@@ -1,0 +1,108 @@
+<script>
+  // Declare in local function scope to avoid bleeding variables into global `window`.
+  (function () {
+
+    // Declare or reuse global namespace.
+    window.oo = window.oo || {}
+
+    oo.buildLog = function buildLog(context, level, timestamp, ...messages) {
+      _checkNotNil(context, () => "illegal argument: context is missing")
+      _checkNotNil(level, () => "illegal argument: level is missing")
+      _checkNotNil(timestamp, () => "illegal argument: timestamp is missing")
+
+      const timestampStr = _formatDate(timestamp)
+      const levelStr = _padLeft("|" + level + "|", 7, " ")
+      const contextStr = "[" + context + "]"
+
+      return [timestampStr, levelStr, contextStr, ...messages]
+    }
+
+    function _formatDate(date) {
+      _checkNotNil(date, () => "illegal argument: date is missing")
+
+      const year = date.getFullYear()
+      const month = date.getMonth() + 1
+      const day = date.getDate()
+      const hours = date.getHours()
+      const minutes = date.getMinutes()
+      const seconds = date.getSeconds()
+      const millis = date.getMilliseconds()
+
+      return "" + year + "-" + _padLeft(month) + "-" + _padLeft(day) +
+        " " + _padLeft(hours) + ":" + _padLeft(minutes) + ":" + _padLeft(seconds) +
+        "." + _padLeft(millis, 3)
+    }
+
+    function _padLeft(value, length = 2, char = "0") {
+      _check(char.length > 0, () => "illegal argument: char is empty")
+
+      let result = "" + value
+      while (result.length < length) {
+        result = char + result
+      }
+      return result
+    }
+
+    oo.json = function json(value, padding = 2) {
+      function replacer(key, value) {
+        if (value && value[Symbol.iterator] && !_isArray(value)) {
+          const array = Array.from(value)
+          if (array && !_isArrayEqual(array, value)) {
+            return array
+          }
+        }
+        return value
+      }
+      return JSON.stringify(value, replacer, padding)
+    }
+
+    oo.json1 = function json1(value) {
+      const string = oo.json(value, 1)
+      return string.split("\n").map(it => it.trim()).join(" ")
+    }
+
+    oo.json0 = function json0(value) {
+      return oo.json(value, 0)
+    }
+
+    function _check(condition, lazyMessage = null) {
+      if (!condition) {
+        if (lazyMessage) {
+          throw new Error(lazyMessage())
+        }
+        throw new Error("illegal argument")
+      }
+    }
+
+    function _checkNotNil(value, lazyMessage = null) {
+      if (_isNil(value)) {
+        if (lazyMessage) {
+          throw new Error(lazyMessage())
+        }
+        throw new Error("illegal argument")
+      }
+    }
+
+    function _isNil(value) {
+      return value === null && value === undefined
+    }
+
+    function _isArray(value) {
+      return Array.isArray(value)
+    }
+
+    function _isArrayEqual(a, b) {
+      if ((a === b) || (_isNil(a) && _isNil(b))) { return true }
+      if (_isNil(a) !== _isNil(b)) { return false }
+      if (a.length !== b.length) { return false }
+
+      for (let index = 0; index < a.length; index++) {
+        if (a[index] !== b[index]) {
+          return false
+        }
+      }
+      return true
+    }
+
+  }())
+</script>
