@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="oo-logger-base.html">
 
 <script>
   // Declare in local function scope to avoid bleeding variables into global `window`.
@@ -13,17 +14,15 @@
      * @polymerMixin
      * @memberof Oo
      */
-    Oo.LoggerMixin = Polymer.dedupingMixin(function (base) {
+    Oo.LoggerMixin = Polymer.dedupingMixin(function (superClass) {
 
       /**
        * @polymerMixinClass
        */
-      class LoggerMixin extends base {
-
+      return class LoggerMixin extends superClass {
         constructor() {
           super()
-
-          this._logger = LoggerFactory.getLogger(this.localName)
+          this._logger = Oo.LoggerFactory.getLogger(this.localName)
         }
 
         _trace(...messages) {
@@ -46,60 +45,62 @@
           this._logger.error(...messages)
         }
       }
-
-      return LoggerMixin
-
     })
 
-    class LoggerFactory {
+    Oo.LoggerFactory = class LoggerFactory {
+      static getLogger(contextName = ROOT_CONTEXT_NAME) {
+        _checkNotNil(contextName, () => "illegal argument: contextName is missing")
 
-      static getLogger(context = ROOT_CONTEXT) {
-        _requireNotNil(context, () => "illegal argument: context")
-
-        if (context === ROOT_CONTEXT) {
+        // return root logger.
+        if (contextName === ROOT_CONTEXT_NAME) {
           return ROOT_LOGGER
         }
 
-        const logger = LOGGER_MAP.get(context)
+        // return registered logger.
+        const logger = LOGGER_MAP.get(contextName)
         if (logger) {
           return logger
         }
 
-        const newLogger = new Logger(context, ROOT_LOGGER)
-        LOGGER_MAP.set(context, newLogger)
+        // return newly registered logger.
+        const newLogger = new Oo.Logger(contextName, ROOT_LOGGER)
+        LOGGER_MAP.set(contextName, newLogger)
         return newLogger
       }
 
+      static getLogLevels() {
+        return LOG_LEVELS
+      }
     }
 
-    class Logger {
-      constructor(context, rootLogger = null) {
-        _requireNotNil(context, () => "illegal argument: context")
+    Oo.Logger = class Logger {
+      constructor(contextName, parentLogger = null) {
+        _checkNotNil(contextName, () => "illegal argument: contextName is missing")
 
-        this._context = context
-        this._rootLogger = rootLogger
-
+        this._contextName = contextName
+        this._parentLogger = parentLogger
         this._logLevel = null
-        // this._restoreLogLevel()
       }
 
-      error() { this._partialLog(LOG_LEVELS.ERROR)(...arguments) }
-      warn() { this._partialLog(LOG_LEVELS.WARN)(...arguments) }
-      info() { this._partialLog(LOG_LEVELS.INFO)(...arguments) }
-      debug() { this._partialLog(LOG_LEVELS.DEBUG)(...arguments) }
-      trace() { this._partialLog(LOG_LEVELS.TRACE)(...arguments) }
+      error() { this._log(LOG_LEVELS.ERROR, ...arguments) }
+      warn() { this._log(LOG_LEVELS.WARN, ...arguments) }
+      info() { this._log(LOG_LEVELS.INFO, ...arguments) }
+      debug() { this._log(LOG_LEVELS.DEBUG, ...arguments) }
+      trace() { this._log(LOG_LEVELS.TRACE, ...arguments) }
 
-      get context() {
-        return this._context
+      get contextName() {
+        return this._contextName
       }
 
       get logLevel() {
         if (this._logLevel) {
           return this._logLevel
         }
-        if (this._rootLogger) {
-          return this._rootLogger.logLevel
+
+        if (this._parentLogger) {
+          return this._parentLogger.logLevel
         }
+
         return DEFAULT_LOG_LEVEL
       }
 
@@ -108,37 +109,36 @@
       }
 
       set logLevelByName(logLevelName) {
-        _requireNotNil(LOG_LEVELS[logLevelName], () => "illegal argument: logLevelName")
+        _checkNotNil(logLevelName, () => "illegal argument: logLevelName")
+        _checkNotNil(LOG_LEVELS[logLevelName], () => "illegal argument: logLevelName")
 
         this._logLevel = LOG_LEVELS[logLevelName]
       }
 
-      _restoreLogLevel() {
-        const logLevelName = _fetchLocalStorage(STORAGE_PREFIX + this.context)
-        if (logLevelName) {
-          return LOG_LEVELS[logLevelName]
-        }
-      }
+      _log(logLevel, ...messages) {
+        _checkNotNil(logLevel, () => "illegal argument: logLevel")
+        _checkNotNil(logLevel.handler, () => "illegal argument: logLevel.handler")
 
-      _partialLog(logLevel) {
-        return (...messages) => {
-          if (this.logLevel >= logLevel) {
-            _log(logLevel.handler, this.context, logLevel.text, ...messages)
-          }
+        if (this.logLevel.level >= logLevel.level) {
+          const handler = logLevel.handler
+          const timestamp = new Date()
+          const contextName = this._contextName
+          const levelName = logLevel.name
+
+          const logMessage = Oo.buildLog(
+            contextName, levelName, timestamp, ...messages
+          )
+          handler(...logMessage)
         }
       }
     }
 
-    Oo.LoggerFactory = LoggerFactory
-
-    Oo.Logger = Logger
-
     const LOG_LEVELS = {
-      ERROR: { level: 1, text: "ERROR", handler: console.error },
-      WARN: { level: 2, text: "WARN", handler: console.warn },
-      INFO: { level: 3, text: "INFO", handler: console.log },
-      DEBUG: { level: 4, text: "DEBUG", handler: console.log },
-      TRACE: { level: 5, text: "TRACE", handler: console.log },
+      ERROR: { level: 1, name: "ERROR", handler: console.error },
+      WARN: { level: 2, name: "WARN", handler: console.warn },
+      INFO: { level: 3, name: "INFO", handler: console.log },
+      DEBUG: { level: 4, name: "DEBUG", handler: console.log },
+      TRACE: { level: 5, name: "TRACE", handler: console.log },
 
       NONE: { level: 0 },
       ALL: { level: 99 }
@@ -146,89 +146,32 @@
 
     const DEFAULT_LOG_LEVEL = LOG_LEVELS.INFO
 
-    const ROOT_CONTEXT = "ROOT"
+    const ROOT_CONTEXT_NAME = "ROOT"
 
-    const ROOT_LOGGER = new Logger(ROOT_CONTEXT, null)
+    const ROOT_LOGGER = new Oo.Logger(ROOT_CONTEXT_NAME, null)
 
     const LOGGER_MAP = new Map()
 
-    const STORAGE_PREFIX = "DOLPHIN_PLATFORM_"
-
-    function _log(handler, context, level, ...messages) {
-      _requireNotNil(handler, () => "illegal argument: handler")
-      _requireNotNil(context, () => "illegal argument: context")
-      _requireNotNil(level, () => "illegal argument: level")
-
-      const now = new Date()
-      handler(
-        _formatDate(now),
-        _padLeft("|" + level + "|", 7, " "),
-        "[" + context + "]",
-        ...messages
-      )
-    }
-
-    // The **sessionStorage** property allows you to access a session Storage object for the
-    // current origin. sessionStorage is similar to Window.localStorage, the only difference is
-    // while data stored in localStorage has no expiration set, data stored in sessionStorage gets
-    // cleared when the page session ends. A page session lasts for as long as the browser is open
-    // and survives over page reloads and restores. Opening a page in a new tab or window will
-    // cause a new session to be initiated, which differs from how session cookies work.
-
-    // The read-only **localStorage** property allows you to access a Storage object for the
-    // Document's origin; the stored data is saved across browser sessions. localStorage is similar
-    // to sessionStorage, except that while data stored in localStorage has no expiration time,
-    // data stored in sessionStorage gets cleared when the page session ends — that is, when the
-    // page is closed.
-
-    function _fetchLocalStorage(name) {
-      return window.localStorage.getItem(name)
-    }
-
-    function _formatDate(date) {
-      const year = date.getFullYear()
-      const month = date.getMonth() + 1
-      const day = date.getDate()
-      const hours = date.getHours()
-      const minutes = date.getMinutes()
-      const seconds = date.getSeconds()
-      const millis = date.getMilliseconds()
-
-      return "" + year + "-" + _padLeft(month) + "-" + _padLeft(day) +
-        " " + _padLeft(hours) + ":" + _padLeft(minutes) + ":" + _padLeft(seconds) +
-        "." + _padLeft(millis, 3)
-    }
-
-    function _padLeft(value, length = 2, char = "0") {
-      _require(char.length > 0, () => "illegal argument: char")
-
-      let result = "" + value
-      while (result.length < length) {
-        result = char + result
+    function _check(condition, lazyMessage = null) {
+      if (!condition) {
+        if (lazyMessage) {
+          throw new Error(lazyMessage())
+        }
+        throw new Error("illegal argument")
       }
-      return result
+    }
+
+    function _checkNotNil(value, lazyMessage = null) {
+      if (_isNil(value)) {
+        if (lazyMessage) {
+          throw new Error(lazyMessage())
+        }
+        throw new Error("illegal argument")
+      }
     }
 
     function _isNil(value) {
       return value === null && value === undefined
-    }
-
-    function _require(condition, lazyMessage = null) {
-      if (!condition) {
-        if (lazyMessage) {
-          throw lazyMessage()
-        }
-        throw "illegal argument"
-      }
-    }
-
-    function _requireNotNil(value, lazyMessage = null) {
-      if (_isNil(value)) {
-        if (lazyMessage) {
-          throw lazyMessage()
-        }
-        throw "illegal argument"
-      }
     }
 
   }())

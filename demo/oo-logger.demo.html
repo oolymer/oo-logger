@@ -1,21 +1,42 @@
+<!doctype html>
 <meta charset="utf-8">
+<title>demo</title>
 
 <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
-<link rel="import" href="../../polymer/lib/elements/dom-bind.html">
+<link rel="import" href="../../polymer/polymer-element.html">
+<link rel="import" href="../../shadycss/apply-shim.html">
+<link rel="import" href="../../polymer/lib/elements/custom-style.html">
+<link rel="import" href="../../polymer/lib/utils/async.html">
+<link rel="import" href="../../polymer/lib/utils/unresolved.html">
+<link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../paper-styles/paper-styles.html">
+<link rel="import" href="../../paper-styles/paper-styles-classes.html">
+
 <link rel="import" href="../oo-logger.html">
 
-<dom-bind>
-  <template>
-    <oo-logger>
-    </oo-logger>
-  </template>
+<body unresolved>
+  <custom-style>
+    <style>
+      body {
+        @apply --paper-font-common-base;
+        background-color: var(--paper-grey-200);
+        margin: 0;
+        overflow: hidden;
+      }
 
-  <script>
+      body {
+        transition: opacity ease-in 0.2s;
+      }
 
-    window.addEventListener("WebComponentsReady", () => {
-      const domBind = document.querySelector("dom-bind")
-      const logger = document.querySelector("oo-logger")
-    })
+      body[unresolved] {
+        opacity: 0;
+        display: block;
+        overflow: hidden;
+        position: relative;
+      }
+    </style>
+  </custom-style>
 
-  </script>
-</dom-bind>
+  <oo-logger></oo-logger>
+</body>
