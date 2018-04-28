@@ -13,7 +13,7 @@
 <link rel="import" href="../../paper-styles/paper-styles.html">
 <link rel="import" href="../../paper-styles/paper-styles-classes.html">
 
-<link rel="import" href="../oo-logger.html">
+<link rel="import" href="../oo-logger-mixin.html">
 
 <body unresolved>
   <custom-style>
@@ -38,5 +38,46 @@
     </style>
   </custom-style>
 
-  <oo-logger></oo-logger>
+  <demo-logger></demo-logger>
 </body>
+
+<dom-module id="demo-logger">
+
+  <script>
+    // Declare in local function scope to avoid bleeding variables into global `window`.
+    (function () {
+
+      /**
+       * @customElement
+       * @polymer
+       */
+      class DemoLogger extends Oo.LoggerMixin(Polymer.Element) {
+        static get is() {
+          return "demo-logger"
+        }
+
+        static get properties() {
+          return {
+            title: {
+              type: String,
+              value: () => "lorem ipsum dolor"
+            }
+          }
+        }
+
+        ready() {
+          super.ready()
+
+          this._trace("title:", this.title)
+          this._debug("title:", this.title)
+          this._info("title:", this.title)
+          this._warn("title:", this.title)
+        }
+      }
+
+      window.customElements.define(DemoLogger.is, DemoLogger)
+
+    }())
+  </script>
+
+</dom-module>
