@@ -5,13 +5,15 @@
 
 <dom-module id="logger-fixture">
   <script>
-    class LoggerFixture extends oo.LoggerMixin(Polymer.Element) {
-      static get is() {
-        return "logger-fixture"
+    window.addEventListener("WebComponentsReady", () => {
+      class LoggerFixture extends oo.LoggerMixin(Polymer.Element) {
+        static get is() {
+          return "logger-fixture"
+        }
       }
-    }
 
-    window.customElements.define(LoggerFixture.is, LoggerFixture)
+      window.customElements.define(LoggerFixture.is, LoggerFixture)
+    })
   </script>
 </dom-module>
 
