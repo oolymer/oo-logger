@@ -2,8 +2,8 @@
   // Declare in local function scope to avoid bleeding variables into global `window`.
   (function () {
 
-    // Declare global namespace.
-    window.Oo = window.Oo || {}
+    // Declare or reuse global namespace.
+    window.oo = window.oo || {}
 
     const STORAGE_PREFIX = "oo.logger."
 
@@ -20,7 +20,7 @@
     // data stored in sessionStorage gets cleared when the page session ends — that is, when the
     // page is closed.
 
-    Oo.logLevelStore = function logLevelStore(contextName, storagePrefix = STORAGE_PREFIX) {
+    oo.logLevelStore = function logLevelStore(contextName, storagePrefix = STORAGE_PREFIX) {
       const store = window.localStorage
       const logLevelKey = storagePrefix + contextName
 

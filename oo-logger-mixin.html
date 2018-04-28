@@ -5,16 +5,16 @@
   // Declare in local function scope to avoid bleeding variables into global `window`.
   (function () {
 
-    // Declare global namespace.
-    window.Oo = window.Oo || {}
+    // Declare or reuse global namespace.
+    window.oo = window.oo || {}
 
     /**
      * A custom element class mixin that provides a collection of utility methods.
      *
      * @polymerMixin
-     * @memberof Oo
+     * @memberof oo
      */
-    Oo.LoggerMixin = Polymer.dedupingMixin(function (superClass) {
+    oo.LoggerMixin = Polymer.dedupingMixin(function (superClass) {
 
       /**
        * @polymerMixinClass
@@ -22,7 +22,7 @@
       return class LoggerMixin extends superClass {
         constructor() {
           super()
-          this._logger = Oo.LoggerFactory.getLogger(this.localName)
+          this._logger = oo.LoggerFactory.getLogger(this.localName)
         }
 
         _trace(...messages) {
@@ -47,7 +47,7 @@
       }
     })
 
-    Oo.LoggerFactory = class LoggerFactory {
+    oo.LoggerFactory = class LoggerFactory {
       static getLogger(contextName = ROOT_CONTEXT_NAME) {
         _checkNotNil(contextName, () => "illegal argument: contextName is missing")
 
@@ -63,7 +63,7 @@
         }
 
         // return newly registered logger.
-        const newLogger = new Oo.Logger(contextName, ROOT_LOGGER)
+        const newLogger = new oo.Logger(contextName, ROOT_LOGGER)
         LOGGER_MAP.set(contextName, newLogger)
         return newLogger
       }
@@ -73,7 +73,7 @@
       }
     }
 
-    Oo.Logger = class Logger {
+    oo.Logger = class Logger {
       constructor(contextName, parentLogger = null) {
         _checkNotNil(contextName, () => "illegal argument: contextName is missing")
 
@@ -125,7 +125,7 @@
           const contextName = this._contextName
           const levelName = logLevel.name
 
-          const logMessage = Oo.buildLog(
+          const logMessage = oo.buildLog(
             contextName, levelName, timestamp, ...messages
           )
           handler(...logMessage)
@@ -148,7 +148,7 @@
 
     const ROOT_CONTEXT_NAME = "ROOT"
 
-    const ROOT_LOGGER = new Oo.Logger(ROOT_CONTEXT_NAME, null)
+    const ROOT_LOGGER = new oo.Logger(ROOT_CONTEXT_NAME, null)
 
     const LOGGER_MAP = new Map()
 

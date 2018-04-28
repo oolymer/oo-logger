@@ -2,10 +2,10 @@
   // Declare in local function scope to avoid bleeding variables into global `window`.
   (function () {
 
-    // Declare global namespace.
-    window.Oo = window.Oo || {}
+    // Declare or reuse global namespace.
+    window.oo = window.oo || {}
 
-    Oo.buildLog = function buildLog(context, level, timestamp, ...messages) {
+    oo.buildLog = function buildLog(context, level, timestamp, ...messages) {
       _checkNotNil(context, () => "illegal argument: context is missing")
       _checkNotNil(level, () => "illegal argument: level is missing")
       _checkNotNil(timestamp, () => "illegal argument: timestamp is missing")
@@ -43,6 +43,28 @@
       return result
     }
 
+    oo.json = function json(value, padding = 2) {
+      function replacer(key, value) {
+        if (value && value[Symbol.iterator] && !_isArray(value)) {
+          const array = Array.from(value)
+          if (array && !_isArrayEqual(array, value)) {
+            return array
+          }
+        }
+        return value
+      }
+      return JSON.stringify(value, replacer, padding)
+    }
+
+    oo.json1 = function json1(value) {
+      const string = oo.json(value, 1)
+      return string.split("\n").map(it => it.trim()).join(" ")
+    }
+
+    oo.json0 = function json0(value) {
+      return oo.json(value, 0)
+    }
+
     function _check(condition, lazyMessage = null) {
       if (!condition) {
         if (lazyMessage) {
@@ -63,6 +85,23 @@
 
     function _isNil(value) {
       return value === null && value === undefined
+    }
+
+    function _isArray(value) {
+      return Array.isArray(value)
+    }
+
+    function _isArrayEqual(a, b) {
+      if ((a === b) || (_isNil(a) && _isNil(b))) { return true }
+      if (_isNil(a) !== _isNil(b)) { return false }
+      if (a.length !== b.length) { return false }
+
+      for (let index = 0; index < a.length; index++) {
+        if (a[index] !== b[index]) {
+          return false
+        }
+      }
+      return true
     }
 
   }())

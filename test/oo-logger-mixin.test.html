@@ -1,16 +1,28 @@
 <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
 <script src="../../web-component-tester/browser.js"></script>
 
-<link rel="import" href="../oo-logger.html">
+<link rel="import" href="../oo-logger-mixin.html">
+
+<dom-module id="logger-fixture">
+  <script>
+    class LoggerFixture extends oo.LoggerMixin(Polymer.Element) {
+      static get is() {
+        return "logger-fixture"
+      }
+    }
+
+    window.customElements.define(LoggerFixture.is, LoggerFixture)
+  </script>
+</dom-module>
 
 <test-fixture id="loggerFixture">
   <template>
-    <oo-logger></oo-logger>
+    <logger-fixture></logger-fixture>
   </template>
 </test-fixture>
 
 <script>
-  suite("<oo-logger>", () => {
+  suite("oo.LoggerMixin", () => {
 
     suite("simple logger", () => {
       let logger
@@ -23,7 +35,7 @@
       test("has local name", done => {
         flush(() => {
           // expect:
-          expect(logger.localName).to.eql("oo-logger")
+          expect(logger.localName).to.eql("logger-fixture")
           done()
         })
       })
@@ -34,7 +46,7 @@
 
       setup(() => {
         // given:
-        logger = Oo.LoggerFactory.getLogger()
+        logger = oo.LoggerFactory.getLogger()
       })
 
       test("context", () => {
