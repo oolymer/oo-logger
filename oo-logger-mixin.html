@@ -57,15 +57,19 @@
         }
 
         // return registered logger.
-        const logger = LOGGER_MAP.get(contextName)
+        const logger = LOGGER_CONTEXTS[contextName]
         if (logger) {
           return logger
         }
 
         // return newly registered logger.
         const newLogger = new oo.Logger(contextName, ROOT_LOGGER)
-        LOGGER_MAP.set(contextName, newLogger)
+        LOGGER_CONTEXTS[contextName] = newLogger
         return newLogger
+      }
+
+      static getLoggerContexts() {
+        return LOGGER_CONTEXTS
       }
 
       static getLogLevels() {
@@ -150,7 +154,7 @@
 
     const ROOT_LOGGER = new oo.Logger(ROOT_CONTEXT_NAME, null)
 
-    const LOGGER_MAP = new Map()
+    const LOGGER_CONTEXTS = {}
 
     function _check(condition, lazyMessage = null) {
       if (!condition) {
