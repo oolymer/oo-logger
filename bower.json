@@ -1,7 +1,7 @@
 {
   "name": "oo-logger",
   "description": "Polymer mixin for browser console logging. Supports different log levels.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "authors": [
     "Benjamin Gudehus <benjamin.gudehus@canoo.com>"
   ],

@@ -78,7 +78,7 @@ $ npm test
 Update the change log.
 
 ~~~
-$ github_changelog_generator oolymer/oo-logger --simple-list --no-issues --output CHANGES.md --header-label "# CHANGES" --future-release v0.1.0
+$ github_changelog_generator oolymer/oo-logger --simple-list --no-issues --output CHANGES.md --header-label "# CHANGES" --future-release v1.5.3
 ~~~
 
 ## Semantic Versions
